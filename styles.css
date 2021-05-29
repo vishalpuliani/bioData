@@ -69,6 +69,17 @@ td {
 .index_btn:focus {
   outline: 0 !important;
 }
+
+@media (max-width: 765px) {
+  .index_image_container {
+    border-radius: 0%;
+  }
+
+  .index_btn {
+    font-size: 22px;
+    padding: 12px 12px;
+  }
+}
 /********* BioData Page *********/
 
 .image-section {
@@ -139,6 +150,10 @@ td {
 }
 
 @media (max-width: 765px) {
+  .carousel-item {
+    width: 100%;
+  }
+
   #name-section {
     padding-bottom: 0;
   }
@@ -147,7 +162,7 @@ td {
 /* Personal Details */
 
 .personalDetailsImage {
-  height: 500px;
+  height: 400px;
 }
 
 /* Education Details */
@@ -224,13 +239,17 @@ td {
   margin-top: 50px;
 }
 
-@media (max-width: 765px) {
+@media (max-width: 770px) {
   .image-Row {
     margin: 0;
   }
 
   .vertical-image {
     margin-top: 30px;
+  }
+
+  #pictures {
+    margin-bottom: 15px;
   }
 }
 
@@ -297,6 +316,12 @@ td {
   font-family: "Great Vibes", cursive;
   font-size: 1.7rem;
   color: #8f8f8f;
+}
+
+@media (max-width: 765px) {
+  .footer-special {
+    font-size: 1.3rem;
+  }
 }
 
 /* To interchange the Education Text and Image Section On Size Reductionn */

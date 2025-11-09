@@ -152,7 +152,7 @@ td {
 /* Name Section */
 #name-section {
   text-align: center;
-  padding: 40px;
+  /* padding: 20px; */
 }
 
 @media (max-width: 765px) {
@@ -366,5 +366,569 @@ td {
     -webkit-order: 1;
     order: 1;
     padding: 0 15px;
+  }
+}
+
+/* ===== Peek Slider (center + side previews) ===== */
+.peek-slider {
+  --offset: 34%; /* how much neighbors “peek” in */
+  --radius: 12px;
+  --shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+
+  max-width: 960px;
+  width: min(92vw, 960px);
+  margin: 10px auto 10px auto;
+  position: relative;
+  height: 600px; /* consistent height so content below doesn’t jump */
+}
+.peek-viewport {
+  position: relative;
+  height: 100%;
+  overflow: visible; /* show neighbors */
+}
+.peek-slide {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 70%; /* width of the center image */
+  height: 100%;
+  transform: translateX(-50%) scale(0.86);
+  opacity: 0.55;
+  transition: transform 0.6s ease, opacity 0.6s ease;
+  will-change: transform, opacity;
+  z-index: 1;
+  display: none;
+}
+.peek-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* crops nicely; keeps images tall + wide */
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* current, prev, next states */
+.peek-slide.is-current {
+  transform: translateX(-50%) scale(1);
+  opacity: 1;
+  z-index: 3;
+  display: block;
+}
+
+.peek-slide.is-prev {
+  transform: translateX(calc(-50% - var(--offset))) scale(0.9);
+  opacity: 0.85;
+  z-index: 2;
+  display: block;
+}
+
+.peek-slide.is-next {
+  transform: translateX(calc(-50% + var(--offset))) scale(0.9);
+  opacity: 0.85;
+  z-index: 2;
+  display: block;
+}
+
+/* circular arrows */
+.peek-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 0;
+  background: #0a4766;
+  color: #fff;
+  font-size: 22px;
+  line-height: 44px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+  opacity: 0.95;
+  z-index: 5;
+}
+.peek-nav.prev {
+  left: -56px;
+} /* a bit outside the frame */
+.peek-nav.next {
+  right: -56px;
+}
+.peek-nav:focus {
+  outline: none;
+}
+.peek-nav:hover {
+  filter: brightness(1.1);
+}
+
+/* Responsive tweaks */
+@media (max-width: 900px) {
+  .peek-slider {
+    height: 380px;
+  }
+  .peek-slide {
+    width: 78%;
+  }
+  .peek-slider {
+    --offset: 38%;
+  }
+  .peek-nav.prev {
+    left: -40px;
+  }
+  .peek-nav.next {
+    right: -40px;
+  }
+}
+@media (max-width: 600px) {
+  .peek-slider {
+    height: 320px;
+  }
+  .peek-slide {
+    width: 88%;
+  }
+  .peek-slider {
+    --offset: 42%;
+  }
+  .peek-nav {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    line-height: 40px;
+  }
+  .peek-nav.prev {
+    left: -34px;
+  }
+  .peek-nav.next {
+    right: -34px;
+  }
+}
+
+/* --- Global safety: never allow sideways scroll --- */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* ===== Peek Slider – responsive, no overflow ===== */
+.peek-slider {
+  /* never wider than the viewport */
+  width: 100%;
+  max-width: min(92vw, 980px);
+  margin: 50px auto 0;
+}
+
+.peek-viewport {
+  position: relative;
+  overflow: hidden; /* clamps peeking content so it can't grow the page */
+  width: 100%;
+  /* responsive height: 230–520px depending on screen */
+  height: clamp(230px, 52vw, 520px);
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
+  background: #fff;
+}
+
+/* The moving strip of slides */
+.peek-track {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  /* horizontal padding creates the “peek” area but stays inside the viewport */
+  padding: 0 4vw;
+  width: max-content; /* content-based width so it doesn’t force page width */
+  will-change: transform;
+}
+
+/* Each slide */
+.peek-slide {
+  flex: 0 0 auto;
+  width: min(84vw, 720px); /* mobile uses ~full width; larger screens cap it */
+  height: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f6f6f6;
+}
+
+.peek-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Arrows – overlay inside the viewport so they never cause overflow */
+.peek-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  outline: none;
+  background: #134c67; /* teal-ish */
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  opacity: 0.95;
+}
+
+.peek-arrow--left {
+  left: 10px;
+}
+.peek-arrow--right {
+  right: 10px;
+}
+
+.peek-arrow:hover {
+  opacity: 1;
+}
+
+/* ===== Breakpoints ===== */
+
+/* Phones: no offscreen peeks (avoids lateral scroll + keeps nav perfect) */
+@media (max-width: 599px) {
+  .peek-viewport {
+    height: clamp(240px, 64vw, 420px);
+    border-radius: 12px;
+  }
+  .peek-track {
+    padding: 0 12px; /* tiny inner padding */
+    gap: 12px;
+  }
+  .peek-slide {
+    width: calc(100% - 24px); /* full width minus the internal padding */
+    border-radius: 12px;
+  }
+  .peek-arrow {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* Tablets+: show subtle peeks left/right */
+@media (min-width: 600px) {
+  .peek-track {
+    padding: 0 8vw;
+  }
+  .peek-slide {
+    width: min(70vw, 760px);
+  }
+}
+
+/* Large desktops: a bit wider, taller */
+@media (min-width: 1024px) {
+  .peek-viewport {
+    height: 520px;
+  }
+  .peek-track {
+    padding: 0 10vw;
+  }
+  .peek-slide {
+    width: min(60vw, 820px);
+  }
+}
+
+/* ===== Gallery layout ===== */
+#gallery {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+#gallery .section-title {
+  text-align: left; /* change to center if you prefer */
+  margin: 0 0 20px;
+}
+
+/* Each row */
+.gallery-row {
+  display: flex;
+  justify-content: center;
+  gap: 48px; /* space between images in a row */
+  margin: 28px 0; /* space between rows */
+  flex-wrap: nowrap; /* keep pattern per row */
+}
+
+/* Single-image rows: center it and keep same vertical rhythm */
+.gallery-row.single {
+  gap: 0;
+}
+
+/* Framed image with inner padding (space between image & blue border) */
+.frame {
+  padding: 10px; /* inner spacing from border to image */
+  border: 4px solid #0f4a68; /* blue border */
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  background: #fff;
+}
+
+/* Never stretch: keep aspect ratio, scale by height */
+.frame img {
+  display: block;
+  height: var(--row-h, 420px); /* default; overridden by row height classes */
+  width: auto; /* preserve aspect ratio */
+  max-width: 100%;
+}
+
+/* Cap frame width so very wide images don’t overflow on large screens */
+.frame {
+  max-width: 560px;
+}
+
+/* Row height presets (choose per row for a nice rhythm) */
+.gallery-row.h460 {
+  --row-h: 460px;
+}
+.gallery-row.h420 {
+  --row-h: 420px;
+}
+.gallery-row.h380 {
+  --row-h: 380px;
+}
+.gallery-row.h360 {
+  --row-h: 360px;
+}
+.gallery-row.h340 {
+  --row-h: 340px;
+}
+.gallery-row.h320 {
+  --row-h: 320px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 992px) {
+  .gallery-row {
+    gap: 32px;
+    margin: 22px 0;
+  }
+  .frame {
+    padding: 8px;
+    border-width: 3px;
+  }
+  .frame {
+    max-width: 520px;
+  }
+  .gallery-row.h460 {
+    --row-h: 420px;
+  }
+  .gallery-row.h420 {
+    --row-h: 380px;
+  }
+  .gallery-row.h380 {
+    --row-h: 340px;
+  }
+  .gallery-row.h360 {
+    --row-h: 320px;
+  }
+  .gallery-row.h340 {
+    --row-h: 300px;
+  }
+  .gallery-row.h320 {
+    --row-h: 280px;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Stack pairs on small phones, keep the 2–1–2–1 vibe visually */
+  .gallery-row {
+    flex-wrap: wrap;
+    gap: 18px;
+    margin: 18px 0;
+  }
+  .gallery-row:not(.single) .frame {
+    flex: 1 1 46%;
+  } /* two per line when stacked */
+  .frame {
+    padding: 6px;
+    border-width: 2px;
+    max-width: 100%;
+  }
+  .gallery-row.h460 {
+    --row-h: 280px;
+  }
+  .gallery-row.h420 {
+    --row-h: 260px;
+  }
+  .gallery-row.h380 {
+    --row-h: 240px;
+  }
+  .gallery-row.h360 {
+    --row-h: 230px;
+  }
+  .gallery-row.h340 {
+    --row-h: 220px;
+  }
+  .gallery-row.h320 {
+    --row-h: 210px;
+  }
+}
+/* ---- Gallery layout ---- */
+#gallery {
+  width: min(1100px, 92vw);
+  margin: 48px auto 80px;
+}
+
+/* one row wrapper */
+.g-row {
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 28px; /* space between cards in a row */
+  margin-block: 34px; /* space between rows */
+}
+
+/* 2-up row: make both equal */
+.g-row.two .g-card {
+  flex: 1 1 0;
+  max-width: 520px; /* keeps them from getting too wide */
+  min-width: 280px;
+  height: 360px; /* consistent height for 2-up */
+}
+
+/* 1-up row: single centered, a bit taller */
+.g-row.one {
+  justify-content: center;
+}
+.g-row.one .g-card {
+  width: min(720px, 68vw); /* nice mid-wide card */
+  height: 460px; /* taller than 2-up for variety */
+}
+
+/* Card frame (blue border with breathing room) */
+.g-card {
+  border: 4px solid #0b4a6d; /* blue frame */
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  background: #fff;
+  overflow: hidden; /* clip image corners */
+  padding: 10px; /* space between image and blue border */
+  display: flex;
+}
+
+.g-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* no stretching */
+  border-radius: 6px;
+}
+
+/* ---- Responsive tweaks ---- */
+@media (max-width: 900px) {
+  .g-row.two {
+    gap: 22px;
+  }
+  .g-row.two .g-card {
+    height: 320px;
+  }
+  .g-row.one .g-card {
+    height: 420px;
+  }
+}
+
+@media (max-width: 640px) {
+  .g-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .g-row.two .g-card,
+  .g-row.one .g-card {
+    width: 92vw;
+    max-width: 540px;
+    height: 380px;
+  }
+}
+
+/* ---------- Final Gallery Styling & Center Alignment ---------- */
+#pictures {
+  text-align: center;
+  padding: 60px 0;
+}
+
+#pictures h2 {
+  text-align: center;
+  margin-bottom: 50px; /* consistent spacing before images */
+  font-weight: 600;
+  font-family: "Caladea", serif;
+}
+
+/* Decorative underline */
+#pictures h2::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background-color: #005082;
+  margin: 10px auto 0;
+  border-radius: 2px;
+}
+
+/* Row layout: center everything perfectly */
+.image-row {
+  display: flex;
+  justify-content: center; /* ensures row is centered */
+  align-items: center;
+  gap: 35px;
+  margin: 0 auto; /* horizontally center */
+  width: fit-content; /* shrink to content width */
+}
+
+/* Consistent gap between rows */
+.image-row + .image-row {
+  margin-top: 60px;
+}
+
+/* Image sizes */
+.image-row img {
+  border: 4px solid #005082;
+  padding: 3px;
+  width: 340px;
+  height: 440px;
+  object-fit: cover;
+  transition: all 0.3s ease;
+  display: block;
+}
+
+/* Row 1 & 3: middle image smaller */
+.row1 img:nth-child(2),
+.row3 img:nth-child(2) {
+  width: 300px;
+  height: 400px;
+  opacity: 0.97;
+}
+
+/* Row 2: middle image larger */
+.row2 img:nth-child(2) {
+  width: 380px;
+  height: 480px;
+  z-index: 2;
+}
+
+/* Hover effect */
+.image-row img:hover {
+  transform: scale(1.03);
+  z-index: 3;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .image-row {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .image-row img {
+    width: 92%;
+    height: auto;
+  }
+
+  .image-row + .image-row {
+    margin-top: 40px;
   }
 }
